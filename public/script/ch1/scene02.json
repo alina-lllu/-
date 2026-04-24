@@ -1,0 +1,341 @@
+{
+  "sceneId": "ch1_scene02",
+  "title": "雨",
+  "background": "assets/backgrounds/cafe_rain.jpg",
+  "bgm": "assets/bgm/rain_outside.mp3",
+  "notes": "背景换成雨景版本：同一家咖啡馆，窗外开始有雨，光线变暗。BGM 加入雨声。",
+  "lines": [
+
+    {
+      "id": "s02_rain_start",
+      "type": "narration",
+      "text": "就在你们都开始收拾东西、准备离开的时候，窗外突然下起雨来。\n不是小雨，是那种让人不得不等一等的雨。",
+      "next": "s02_kai_rain"
+    },
+
+    {
+      "id": "s02_kai_rain",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……下雨了。"
+    },
+    {
+      "id": "s02_kai_rain2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "等一下吧。",
+      "next": "s02_settle_back"
+    },
+
+    {
+      "id": "s02_settle_back",
+      "type": "narration",
+      "text": "你们重新坐下。服务员过来问要不要续杯，你们都要了。\n这次没有借口说要走了。",
+      "next": "s02_kai_work"
+    },
+
+    {
+      "id": "s02_kai_work",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……你在做什么工作。"
+    },
+    {
+      "id": "s02_kai_work2",
+      "type": "narration",
+      "text": "他把咖啡杯搁在一边，第一次在这个下午真正看着你等答案。",
+      "next": "s02_player_work"
+    },
+
+    {
+      "id": "s02_player_work",
+      "type": "choice",
+      "prompt": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "设计相关的，你大概不感兴趣。",
+          "affectionDelta": 5,
+          "next": "s02_work_a"
+        },
+        {
+          "id": "B",
+          "text": "跟你完全不同的行业。",
+          "affectionDelta": 3,
+          "next": "s02_work_b"
+        },
+        {
+          "id": "C",
+          "text": "ai_input",
+          "label": "✨ 说说你做的事",
+          "next": "s02_work_ai"
+        }
+      ]
+    },
+
+    {
+      "id": "s02_work_a",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "slight_smile",
+      "text": "……为什么觉得我不感兴趣。"
+    },
+    {
+      "id": "s02_work_a2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "attentive",
+      "text": "说说看。",
+      "next": "s02_work_continue"
+    },
+
+    {
+      "id": "s02_work_b",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……不同行业。"
+    },
+    {
+      "id": "s02_work_b2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "什么行业。",
+      "next": "s02_work_continue"
+    },
+
+    {
+      "id": "s02_work_ai",
+      "type": "ai_dialogue",
+      "character": "kai",
+      "contextNote": "玩家说了自己的工作。凯恒会认真听，然后问一个很具体的问题——他不做表面寒暄，他真的想知道这份工作是什么感觉，有什么难的地方，或者什么让她喜欢。一句话，具体，不是'哇好厉害'这种回应。",
+      "emotion_on_response": "attentive",
+      "fallbackKey": "generic",
+      "affectionOnPositive": 10,
+      "affectionOnNeutral": 5,
+      "affectionOnNegative": 2,
+      "next": "s02_work_continue"
+    },
+
+    {
+      "id": "s02_work_continue",
+      "type": "narration",
+      "text": "你们说了一会儿工作的事。\n他问的问题都很具体，不是那种\"工作辛苦吗\"的废话。",
+      "next": "s02_kai_share"
+    },
+
+    {
+      "id": "s02_kai_share",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……最近在做一个改造项目。老旧小区的公共空间。"
+    },
+    {
+      "id": "s02_kai_share2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "distant",
+      "text": "居民们想要的东西，跟甲方想要的东西，不一样。"
+    },
+    {
+      "id": "s02_kai_share3",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……挺难的。",
+      "next": "s02_player_respond_kai"
+    },
+
+    {
+      "id": "s02_player_respond_kai",
+      "type": "choice",
+      "prompt": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "那你站哪边？",
+          "affectionDelta": 10,
+          "next": "s02_respond_a"
+        },
+        {
+          "id": "B",
+          "text": "听起来很消耗人。",
+          "affectionDelta": 7,
+          "next": "s02_respond_b"
+        },
+        {
+          "id": "C",
+          "text": "ai_input",
+          "label": "✨ 说说你的想法",
+          "next": "s02_respond_ai"
+        }
+      ]
+    },
+
+    {
+      "id": "s02_respond_a",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……"
+    },
+    {
+      "id": "s02_respond_a2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "居民那边。",
+      "next": "s02_respond_a3"
+    },
+    {
+      "id": "s02_respond_a3",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "一直都是。",
+      "next": "s02_rain_easing"
+    },
+
+    {
+      "id": "s02_respond_b",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……还好。"
+    },
+    {
+      "id": "s02_respond_b2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "做设计是这样的，有时候。",
+      "next": "s02_rain_easing"
+    },
+
+    {
+      "id": "s02_respond_ai",
+      "type": "ai_dialogue",
+      "character": "kai",
+      "contextNote": "玩家对凯恒说了他工作处境的看法。凯恒没想到她会这样说。根据玩家说的内容，他用一两句话回应——如果玩家说了什么有见地的话，他会稍微愣一下，然后说'……没想到你这么看'之类的。如果玩家说的是安慰的话，他会说谢谢但表示不需要。他不接受被可怜。",
+      "emotion_on_response": "attentive",
+      "fallbackKey": "generic",
+      "affectionOnPositive": 12,
+      "affectionOnNeutral": 6,
+      "affectionOnNegative": 1,
+      "next": "s02_rain_easing"
+    },
+
+    {
+      "id": "s02_rain_easing",
+      "type": "narration",
+      "text": "窗外的雨渐渐小了，但还没停。\n天已经开始暗下来，咖啡馆里亮起了灯。",
+      "next": "s02_kai_remember"
+    },
+
+    {
+      "id": "s02_kai_remember",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……上次见面，你说你不喜欢太吵的地方。"
+    },
+    {
+      "id": "s02_kai_remember2",
+      "type": "narration",
+      "text": "你愣了一下。\n那是在朋友的聚会上，你随口说的一句话。你自己都不记得了。",
+      "next": "s02_kai_remember3"
+    },
+    {
+      "id": "s02_kai_remember3",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……所以找了这里。",
+      "next": "s02_player_realize"
+    },
+
+    {
+      "id": "s02_player_realize",
+      "type": "choice",
+      "prompt": null,
+      "affectionNote": "这是第一章情感浓度最高的节点。凯恒承认他为了她选了这家咖啡馆——哪怕他不会承认这件事的意义。",
+      "options": [
+        {
+          "id": "A",
+          "text": "……你记得那句话。",
+          "affectionDelta": 12,
+          "next": "s02_realize_a"
+        },
+        {
+          "id": "B",
+          "text": "所以这不是偶遇。",
+          "affectionDelta": 10,
+          "next": "s02_realize_b"
+        },
+        {
+          "id": "C",
+          "text": "ai_input",
+          "label": "✨ 说说你现在的感受或想法",
+          "next": "s02_realize_ai"
+        }
+      ]
+    },
+
+    {
+      "id": "s02_realize_a",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……"
+    },
+    {
+      "id": "s02_realize_a2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "记得。",
+      "next": "s02_end_transition"
+    },
+
+    {
+      "id": "s02_realize_b",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……偶遇。"
+    },
+    {
+      "id": "s02_realize_b2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "算是。",
+      "next": "s02_end_transition"
+    },
+
+    {
+      "id": "s02_realize_ai",
+      "type": "ai_dialogue",
+      "character": "kai",
+      "contextNote": "刚才凯恒承认他记得她的话，并且选了这家咖啡馆。玩家说了她的反应。这是整个第一章情感最浓的时刻。凯恒不会顺势说'因为我一直在想你'之类的话——他太克制了。他会用一个很短的回应，可能是转移话题，可能是沉默，可能是问她另一件事。但这个沉默本身是答案。",
+      "emotion_on_response": "warm",
+      "fallbackKey": "generic",
+      "affectionOnPositive": 15,
+      "affectionOnNeutral": 8,
+      "affectionOnNegative": 2,
+      "next": "s02_end_transition"
+    },
+
+    {
+      "id": "s02_end_transition",
+      "type": "narration",
+      "text": "雨停了。\n你们同时看向窗外，地面是湿的，空气里有泥土和凉意。",
+      "next": "ch1_scene03"
+    }
+  ]
+}

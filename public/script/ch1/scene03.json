@@ -1,0 +1,115 @@
+{
+  "sceneId": "ch1_scene03",
+  "title": "临走前",
+  "background": "assets/backgrounds/cafe_exit_evening.jpg",
+  "bgm": "assets/bgm/quiet_evening.mp3",
+  "notes": "背景：咖啡馆门口，傍晚，地面反光。氛围偏静，灯光暖黄。这是第一章的收尾场景。",
+  "lines": [
+
+    {
+      "id": "s03_exit",
+      "type": "narration",
+      "text": "你们收拾好东西，走到咖啡馆门口。\n外面的空气凉了很多，路灯已经亮起来了。",
+      "next": "s03_goodbye_setup"
+    },
+
+    {
+      "id": "s03_goodbye_setup",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……方向呢。哪边。"
+    },
+    {
+      "id": "s03_goodbye_setup2",
+      "type": "narration",
+      "text": "你说了你要去的方向。他点了点头，是另一个方向。",
+      "next": "s03_branch_affection"
+    },
+
+    {
+      "id": "s03_branch_affection",
+      "type": "affection_branch",
+      "character": "kai",
+      "branches": [
+        { "condition": "affection >= 50", "next": "s03_good_end" },
+        { "condition": "affection >= 30", "next": "s03_normal_end" },
+        { "condition": "affection < 30",  "next": "s03_bad_end" }
+      ]
+    },
+
+    {
+      "id": "s03_good_end",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……那，再见。"
+    },
+    {
+      "id": "s03_good_end2",
+      "type": "narration",
+      "text": "他转身。走了两步。停下来。",
+      "next": "s03_good_end3"
+    },
+    {
+      "id": "s03_good_end3",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "slight_smile",
+      "text": "……下次，还来这里？"
+    },
+    {
+      "id": "s03_good_end4",
+      "type": "narration",
+      "text": "他没有等你回答，就继续往前走了。\n但你看见他耳朵有点红。\n\n也许是冷的。\n也许不是。",
+      "next": "s03_chapter_end"
+    },
+
+    {
+      "id": "s03_normal_end",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……再见。"
+    },
+    {
+      "id": "s03_normal_end2",
+      "type": "narration",
+      "text": "他转身走了。\n走到路口，他回了一下头。\n你们的视线碰了一秒，他转回去，走了。",
+      "next": "s03_chapter_end"
+    },
+
+    {
+      "id": "s03_bad_end",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "有事先走了。"
+    },
+    {
+      "id": "s03_bad_end2",
+      "type": "narration",
+      "text": "他没有回头。\n\n你站在咖啡馆门口，看着他的背影消失在街角。\n不知道为什么，有一点点，说不清的遗憾。",
+      "next": "s03_chapter_end"
+    },
+
+    {
+      "id": "s03_chapter_end",
+      "type": "chapter_end",
+      "chapterId": "ch1",
+      "title": "第一章 · 完",
+      "subtitle": "深秋，偶遇",
+      "stats": {
+        "show": true,
+        "fields": ["affection", "ai_dialogue_count", "scenes_completed"]
+      },
+      "next_chapter": "ch2_scene01",
+      "unlock_memory": {
+        "condition": "affection >= 50",
+        "memoryId": "ch1_cafe_moment",
+        "memoryTitle": "那天下午的咖啡馆",
+        "memoryText": "他说他记得你不喜欢吵的地方。\n所以找了这里。\n\n你不知道这算不算什么。但你记住了他说这话时的表情。"
+      }
+    }
+  ]
+}

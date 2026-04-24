@@ -1,0 +1,328 @@
+{
+  "sceneId": "ch1_scene01",
+  "title": "偶遇",
+  "background": "assets/backgrounds/cafe_afternoon.jpg",
+  "bgm": "assets/bgm/warm_afternoon.mp3",
+  "initialCharacter": "kai",
+  "initialEmotion": "neutral",
+  "lines": [
+
+    {
+      "id": "s01_intro",
+      "type": "narration",
+      "text": "深秋的午后，阳光从玻璃窗斜切进来，把咖啡馆的木桌照得有点亮。\n你刚点了咖啡，找了个靠窗的位子，正翻开手里的书。",
+      "next": "s01_door"
+    },
+
+    {
+      "id": "s01_door",
+      "type": "narration",
+      "text": "门口传来一点动静。你没有抬头。",
+      "next": "s01_kai_enter"
+    },
+
+    {
+      "id": "s01_kai_enter",
+      "type": "character_enter",
+      "character": "kai",
+      "emotion": "neutral",
+      "animation": "slide_in_right",
+      "next": "s01_kai_notice"
+    },
+
+    {
+      "id": "s01_kai_notice",
+      "type": "narration",
+      "text": "是凯恒。\n你认出他的时候，他也认出了你。",
+      "next": "s01_kai_l1"
+    },
+
+    {
+      "id": "s01_kai_l1",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……这里。"
+    },
+    {
+      "id": "s01_kai_l1b",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "咖啡馆满了。可以坐对面吗。",
+      "next": "s01_player_choice1"
+    },
+
+    {
+      "id": "s01_player_choice1",
+      "type": "choice",
+      "prompt": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "当然，请坐。",
+          "affectionDelta": 5,
+          "emotion": "friendly",
+          "next": "s01_sit_a"
+        },
+        {
+          "id": "B",
+          "text": "好久不见。",
+          "affectionDelta": 8,
+          "emotion": "warm",
+          "next": "s01_sit_b"
+        },
+        {
+          "id": "C",
+          "text": "随便。",
+          "affectionDelta": 0,
+          "emotion": "neutral",
+          "next": "s01_sit_c"
+        }
+      ]
+    },
+
+    {
+      "id": "s01_sit_a",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……谢。",
+      "next": "s01_order"
+    },
+    {
+      "id": "s01_sit_b",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "attentive",
+      "text": "……嗯。好久不见。",
+      "next": "s01_order"
+    },
+    {
+      "id": "s01_sit_c",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……",
+      "next": "s01_order"
+    },
+
+    {
+      "id": "s01_order",
+      "type": "narration",
+      "text": "他在对面坐下，叫了服务员，要了黑咖啡，没加糖。\n你们之间沉默了一会儿。不算太尴尬。",
+      "next": "s01_kai_look"
+    },
+
+    {
+      "id": "s01_kai_look",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "attentive",
+      "text": "在看什么书。"
+    },
+    {
+      "id": "s01_kai_look_b",
+      "type": "narration",
+      "text": "他的视线落在你手边的书封上，等你回答。",
+      "next": "s01_player_choice2"
+    },
+
+    {
+      "id": "s01_player_choice2",
+      "type": "choice",
+      "prompt": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "建筑方面的，借来的。",
+          "affectionDelta": 10,
+          "next": "s01_book_a"
+        },
+        {
+          "id": "B",
+          "text": "小说，不太好看。",
+          "affectionDelta": 5,
+          "next": "s01_book_b"
+        },
+        {
+          "id": "C",
+          "text": "ai_input",
+          "label": "✨ 随口说说你在看什么，或者别的什么",
+          "next": "s01_book_ai"
+        }
+      ]
+    },
+
+    {
+      "id": "s01_book_a",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……"
+    },
+    {
+      "id": "s01_book_a2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "slight_smile",
+      "text": "哪本。",
+      "next": "s01_book_a3"
+    },
+    {
+      "id": "s01_book_a3",
+      "type": "narration",
+      "text": "你翻给他看封面。他扫了一眼，沉默了几秒。",
+      "next": "s01_book_a4"
+    },
+    {
+      "id": "s01_book_a4",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "那本书有个地方写错了。第三章的案例，数据对不上。",
+      "next": "s01_book_a5"
+    },
+    {
+      "id": "s01_book_a5",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……有兴趣的话，等你翻到那里，可以告诉你哪里。",
+      "next": "s01_continue"
+    },
+
+    {
+      "id": "s01_book_b",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "那就放下来。",
+      "next": "s01_book_b2"
+    },
+    {
+      "id": "s01_book_b2",
+      "type": "narration",
+      "text": "你没想到他会这么说。他的眼神没有开玩笑的意思。",
+      "next": "s01_continue"
+    },
+
+    {
+      "id": "s01_book_ai",
+      "type": "ai_dialogue",
+      "character": "kai",
+      "contextNote": "玩家刚才回答了凯恒关于在看什么书的问题。根据玩家说的内容，用凯恒的风格自然地回应。凯恒会对任何有内容的东西表示兴趣，用一两句话，不多说。",
+      "emotion_on_response": "attentive",
+      "fallbackKey": "generic",
+      "affectionOnPositive": 8,
+      "affectionOnNeutral": 4,
+      "affectionOnNegative": 1,
+      "next": "s01_continue"
+    },
+
+    {
+      "id": "s01_continue",
+      "type": "narration",
+      "text": "咖啡送来了。他的黑咖啡，你的那杯，各自放在桌子两端。\n窗外的梧桐树在风里动了一下，叶子掉了几片。",
+      "next": "s01_kai_question"
+    },
+
+    {
+      "id": "s01_kai_question",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "最近……还好吗。",
+      "next": "s01_kai_question2"
+    },
+    {
+      "id": "s01_kai_question2",
+      "type": "narration",
+      "text": "他问这话的时候没有看你，在用手指转着咖啡杯。\n这个问题比他平时说的话要长一点。",
+      "next": "s01_player_choice3"
+    },
+
+    {
+      "id": "s01_player_choice3",
+      "type": "choice",
+      "prompt": null,
+      "options": [
+        {
+          "id": "A",
+          "text": "还行，就是有点累。",
+          "affectionDelta": 5,
+          "next": "s01_wellbeing_a"
+        },
+        {
+          "id": "B",
+          "text": "你为什么突然问这个。",
+          "affectionDelta": 8,
+          "next": "s01_wellbeing_b"
+        },
+        {
+          "id": "C",
+          "text": "ai_input",
+          "label": "✨ 说说你最近真正的状态",
+          "next": "s01_wellbeing_ai"
+        }
+      ]
+    },
+
+    {
+      "id": "s01_wellbeing_a",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……嗯。",
+      "next": "s01_wellbeing_a2"
+    },
+    {
+      "id": "s01_wellbeing_a2",
+      "type": "narration",
+      "text": "他没有再说。但他的手停在了杯子上。",
+      "next": "s01_end_scene_transition"
+    },
+
+    {
+      "id": "s01_wellbeing_b",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……没有为什么。"
+    },
+    {
+      "id": "s01_wellbeing_b2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "随口问的。",
+      "next": "s01_wellbeing_b3"
+    },
+    {
+      "id": "s01_wellbeing_b3",
+      "type": "narration",
+      "text": "你不太相信。他不是会「随口问」任何事的人。",
+      "next": "s01_end_scene_transition"
+    },
+
+    {
+      "id": "s01_wellbeing_ai",
+      "type": "ai_dialogue",
+      "character": "kai",
+      "contextNote": "玩家刚才说了最近的真实状态。凯恒会认真听完，然后用他的方式回应——不给建议，不说'你要照顾好自己'这种话，只是在那里。他可能只说一句话，或者什么都不说，只是把手边的纸巾盒推近了一点。",
+      "emotion_on_response": "attentive",
+      "fallbackKey": "generic",
+      "affectionOnPositive": 10,
+      "affectionOnNeutral": 6,
+      "affectionOnNegative": 2,
+      "next": "s01_end_scene_transition"
+    },
+
+    {
+      "id": "s01_end_scene_transition",
+      "type": "narration",
+      "text": "窗外的光渐渐暖了起来，下午两点变成了快三点。\n你们没有一直说话，但也没有离开的意思。",
+      "next": "ch1_scene02"
+    }
+  ]
+}
