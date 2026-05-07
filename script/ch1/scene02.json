@@ -69,8 +69,8 @@
         },
         {
           "id": "C",
-          "text": "ai_input",
-          "label": "✨ 说说你做的事",
+          "text": "做一些需要反复改来改去的事。",
+          "affectionDelta": 5,
           "next": "s02_work_ai"
         }
       ]
@@ -110,14 +110,10 @@
 
     {
       "id": "s02_work_ai",
-      "type": "ai_dialogue",
-      "character": "kai",
-      "contextNote": "玩家说了自己的工作。凯恒会认真听，然后问一个很具体的问题——他不做表面寒暄，他真的想知道这份工作是什么感觉，有什么难的地方，或者什么让她喜欢。一句话，具体，不是'哇好厉害'这种回应。",
-      "emotion_on_response": "attentive",
-      "fallbackKey": "generic",
-      "affectionOnPositive": 10,
-      "affectionOnNeutral": 5,
-      "affectionOnNegative": 2,
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "attentive",
+      "text": "……反复改，说明你在乎结果。最难的部分是什么。",
       "next": "s02_work_continue"
     },
 
@@ -158,21 +154,42 @@
       "options": [
         {
           "id": "A",
-          "text": "那你站哪边？",
-          "affectionDelta": 10,
-          "next": "s02_respond_a"
-        },
-        {
-          "id": "B",
           "text": "听起来很消耗人。",
-          "affectionDelta": 7,
+          "label": "[共情]",
+          "affectionDelta": 10,
+          "skillUsed": { "id": "empathy", "expGain": 2 },
           "next": "s02_respond_b"
         },
         {
+          "id": "B",
+          "text": "那你站哪边？",
+          "label": "[追问]",
+          "affectionDelta": 8,
+          "skillUsed": { "id": "probe", "expGain": 2 },
+          "next": "s02_respond_a"
+        },
+        {
           "id": "C",
-          "text": "ai_input",
-          "label": "✨ 说说你的想法",
+          "text": "你不用解释，我大概懂。",
+          "label": "[边界感]",
+          "affectionDelta": 6,
+          "skillUsed": { "id": "boundary", "expGain": 2 },
+          "next": "s02_boundary_silence"
+        },
+        {
+          "id": "D",
+          "text": "如果一直站居民那边，会不会很难。",
+          "affectionDelta": 8,
           "next": "s02_respond_ai"
+        },
+        {
+          "id": "E",
+          "text": "不站那边的话，你做这行就没意义了，对吗。",
+          "label": "[共情]",
+          "affectionDelta": 12,
+          "skillUsed": { "id": "empathy", "expGain": 3 },
+          "requiredSkill": { "id": "empathy", "level": 1 },
+          "next": "s02_respond_empathy_extra"
         }
       ]
     },
@@ -188,7 +205,7 @@
       "id": "s02_respond_a2",
       "type": "dialogue",
       "speaker": "kai",
-      "emotion": "neutral",
+      "emotion": "distant",
       "text": "居民那边。",
       "next": "s02_respond_a3"
     },
@@ -198,6 +215,13 @@
       "speaker": "kai",
       "emotion": "neutral",
       "text": "一直都是。",
+      "next": "s02_probe_toast"
+    },
+    {
+      "id": "s02_probe_toast",
+      "type": "skill_toast",
+      "skill": "probe",
+      "text": "他没有回避，但也没有让你再问下去。",
       "next": "s02_rain_easing"
     },
 
@@ -205,7 +229,7 @@
       "id": "s02_respond_b",
       "type": "dialogue",
       "speaker": "kai",
-      "emotion": "neutral",
+      "emotion": "warm",
       "text": "……还好。"
     },
     {
@@ -214,19 +238,100 @@
       "speaker": "kai",
       "emotion": "neutral",
       "text": "做设计是这样的，有时候。",
+      "next": "s02_empathy_moment"
+    },
+    {
+      "id": "s02_empathy_moment",
+      "type": "narration",
+      "text": "你们各自端起咖啡，没再说话。\n窗外的雨声很细，咖啡馆里只剩下杯沿碰桌的声音。",
+      "next": "s02_empathy_toast",
+      "image": {
+        "path": "assets/cg/ch1/s02_quiet_understanding.png",
+        "status": "pending",
+        "prompt": "咖啡馆窗边俯视构图，两只白瓷咖啡杯各放在桌面两端，两双手分别托着杯子但视线没有交汇，窗外雨痕，暖色灯光，景深，电影感，留白多",
+        "description": "[共情] 选项触发的 CG。表现「没说话也是一种承接」的瞬间。"
+      }
+    },
+    {
+      "id": "s02_empathy_toast",
+      "type": "skill_toast",
+      "skill": "empathy",
+      "text": "你接住了他没说出口的那一段。",
+      "next": "s02_rain_easing"
+    },
+
+    {
+      "id": "s02_boundary_silence",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……"
+    },
+    {
+      "id": "s02_boundary_silence2",
+      "type": "narration",
+      "text": "他没有立刻接话。但你能感觉到他不是在尴尬，是在认真停一停。",
+      "next": "s02_boundary_thanks"
+    },
+    {
+      "id": "s02_boundary_thanks",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "warm",
+      "text": "……谢。",
+      "next": "s02_boundary_toast"
+    },
+    {
+      "id": "s02_boundary_toast",
+      "type": "skill_toast",
+      "skill": "boundary",
+      "text": "你没有逼他往前走半步，他反而靠近了一点点。",
       "next": "s02_rain_easing"
     },
 
     {
       "id": "s02_respond_ai",
-      "type": "ai_dialogue",
-      "character": "kai",
-      "contextNote": "玩家对凯恒说了他工作处境的看法。凯恒没想到她会这样说。根据玩家说的内容，他用一两句话回应——如果玩家说了什么有见地的话，他会稍微愣一下，然后说'……没想到你这么看'之类的。如果玩家说的是安慰的话，他会说谢谢但表示不需要。他不接受被可怜。",
-      "emotion_on_response": "attentive",
-      "fallbackKey": "generic",
-      "affectionOnPositive": 12,
-      "affectionOnNeutral": 6,
-      "affectionOnNegative": 1,
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……会。但不站那边，设计就只剩图纸了。",
+      "next": "s02_rain_easing"
+    },
+
+    {
+      "id": "s02_respond_empathy_extra",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……"
+    },
+    {
+      "id": "s02_kai_open_a",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "warm",
+      "text": "……是。"
+    },
+    {
+      "id": "s02_kai_open_a2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "我做设计的第一年，画过一个商场。甲方很满意，业主也满意。三年之后我去看，里面没有一处给小孩坐下来的地方。"
+    },
+    {
+      "id": "s02_kai_open_a3",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "distant",
+      "text": "从那以后我就知道，图纸上看着合理的事，落到地上不一定。",
+      "next": "s02_kai_open_a_toast"
+    },
+    {
+      "id": "s02_kai_open_a_toast",
+      "type": "skill_toast",
+      "skill": "empathy",
+      "text": "你听见了他平时不会讲的那段。",
       "next": "s02_rain_easing"
     },
 
@@ -279,8 +384,8 @@
         },
         {
           "id": "C",
-          "text": "ai_input",
-          "label": "✨ 说说你现在的感受或想法",
+          "text": "我不知道该高兴，还是该装作没听懂。",
+          "affectionDelta": 12,
           "next": "s02_realize_ai"
         }
       ]
@@ -320,14 +425,10 @@
 
     {
       "id": "s02_realize_ai",
-      "type": "ai_dialogue",
-      "character": "kai",
-      "contextNote": "刚才凯恒承认他记得她的话，并且选了这家咖啡馆。玩家说了她的反应。这是整个第一章情感最浓的时刻。凯恒不会顺势说'因为我一直在想你'之类的话——他太克制了。他会用一个很短的回应，可能是转移话题，可能是沉默，可能是问她另一件事。但这个沉默本身是答案。",
-      "emotion_on_response": "warm",
-      "fallbackKey": "generic",
-      "affectionOnPositive": 15,
-      "affectionOnNeutral": 8,
-      "affectionOnNegative": 2,
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "warm",
+      "text": "……不用装。听懂就行。",
       "next": "s02_end_transition"
     },
 

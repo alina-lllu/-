@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "notes": "5 个 MVP 技能定义。promptFragment 为玩家使用该技能时注入到 AI system prompt 的片段；emotionMapping 是该技能容易触发的角色情绪。对应 docs/skill-system-todo.md 第 105-121 行。",
+  "skills": [
+    {
+      "id": "observe",
+      "name": "观察",
+      "description": "看见对方没说出口的细节。解锁额外对话选项；AI prompt 增加「玩家注意到细节」上下文。",
+      "maxLevel": 3,
+      "tags": ["细节", "察觉", "非语言"],
+      "promptFragment": "玩家注意到了凯恒一个细节——比如手势、视线、停顿，但没有立刻挑明。回应时不要让凯恒一下子解释太多。",
+      "emotionMapping": {
+        "primary": "caught",
+        "secondary": "attentive"
+      },
+      "icon": {
+        "path": "assets/icons/skill_observe.svg",
+        "status": "pending",
+        "prompt": "极简线描眼睛 icon，单色，搭配一颗小光点表示察觉",
+        "description": "用于 ChoicePanel 选项前的小标签"
+      }
+    },
+    {
+      "id": "empathy",
+      "name": "共情",
+      "description": "接住角色情绪，但不逼问。正向情绪回应概率提高；好感度小幅增加。",
+      "maxLevel": 3,
+      "tags": ["温和", "承接", "陪伴"],
+      "promptFragment": "玩家温和地承接了凯恒的情绪，没有评判也没有追问。凯恒可以稍微放松，回应可以稍微长一点点。",
+      "emotionMapping": {
+        "primary": "warm",
+        "secondary": "neutral"
+      },
+      "icon": {
+        "path": "assets/icons/skill_empathy.svg",
+        "status": "pending",
+        "prompt": "两条柔和的弧线交汇成心形的极简 icon，单色",
+        "description": "用于 ChoicePanel 选项前的小标签"
+      }
+    },
+    {
+      "id": "probe",
+      "name": "追问",
+      "description": "推进更深层信息。可能解锁隐藏记忆；也可能触发 distant 情绪。",
+      "maxLevel": 3,
+      "tags": ["靠近", "风险", "回避点"],
+      "promptFragment": "玩家正在追问凯恒的回避点。凯恒可能短暂沉默、转移话题，或者罕见地说一句出乎意料的真话。",
+      "emotionMapping": {
+        "primary": "distant",
+        "secondary": "caught"
+      },
+      "icon": {
+        "path": "assets/icons/skill_probe.svg",
+        "status": "pending",
+        "prompt": "极简箭头穿过一道半圆的 icon，单色，表示推进过界",
+        "description": "用于 ChoicePanel 选项前的小标签"
+      }
+    },
+    {
+      "id": "boundary",
+      "name": "边界感",
+      "description": "不强迫角色表达。降低负面回应；提高信任度。",
+      "maxLevel": 3,
+      "tags": ["留白", "信任", "克制"],
+      "promptFragment": "玩家选择了不追问、给凯恒留白。凯恒会觉得安全，可能会主动多说一句，但语气不变激烈。",
+      "emotionMapping": {
+        "primary": "neutral",
+        "secondary": "warm"
+      },
+      "icon": {
+        "path": "assets/icons/skill_boundary.svg",
+        "status": "pending",
+        "prompt": "两条平行短竖线 icon，单色，表示尊重的留白",
+        "description": "用于 ChoicePanel 选项前的小标签"
+      }
+    },
+    {
+      "id": "direct",
+      "name": "直球",
+      "description": "明确表达玩家态度。好感度波动更大；触发 caught / slight_smile。",
+      "maxLevel": 3,
+      "tags": ["直接", "破冰", "高情绪"],
+      "promptFragment": "玩家直接、不绕弯地表达了态度。凯恒的节奏被打乱，反应是先愣一下，再慢半拍回应——可能是 caught，也可能是不易察觉的 slight_smile。",
+      "emotionMapping": {
+        "primary": "caught",
+        "secondary": "slight_smile"
+      },
+      "icon": {
+        "path": "assets/icons/skill_direct.svg",
+        "status": "pending",
+        "prompt": "极简实心圆点 + 一道直线穿过的 icon，单色，表示直击",
+        "description": "用于 ChoicePanel 选项前的小标签"
+      }
+    }
+  ]
+}

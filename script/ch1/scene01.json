@@ -147,8 +147,8 @@
         },
         {
           "id": "C",
-          "text": "ai_input",
-          "label": "✨ 随口说说你在看什么，或者别的什么",
+          "text": "其实没怎么看进去，只是在发呆。",
+          "affectionDelta": 4,
           "next": "s01_book_ai"
         }
       ]
@@ -209,14 +209,10 @@
 
     {
       "id": "s01_book_ai",
-      "type": "ai_dialogue",
-      "character": "kai",
-      "contextNote": "玩家刚才回答了凯恒关于在看什么书的问题。根据玩家说的内容，用凯恒的风格自然地回应。凯恒会对任何有内容的东西表示兴趣，用一两句话，不多说。",
-      "emotion_on_response": "attentive",
-      "fallbackKey": "generic",
-      "affectionOnPositive": 8,
-      "affectionOnNeutral": 4,
-      "affectionOnNegative": 1,
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "attentive",
+      "text": "……发呆也算是在看。至少比硬看下去好。",
       "next": "s01_continue"
     },
 
@@ -239,7 +235,13 @@
       "id": "s01_kai_question2",
       "type": "narration",
       "text": "他问这话的时候没有看你，在用手指转着咖啡杯。\n这个问题比他平时说的话要长一点。",
-      "next": "s01_player_choice3"
+      "next": "s01_player_choice3",
+      "image": {
+        "path": "assets/cg/ch1/s01_kai_finger_cup.png",
+        "status": "pending",
+        "prompt": "男主修长手指轻转白瓷咖啡杯特写，木桌纹理，午后斜光从左侧打来，景深虚化背景，暖色调，电影感",
+        "description": "凯恒紧张/思考时的小动作特写。在玩家选择回应他「最近还好吗」之前显示 1 拍，强化「观察」技能的伏笔。"
+      }
     },
 
     {
@@ -249,23 +251,108 @@
       "options": [
         {
           "id": "A",
-          "text": "还行，就是有点累。",
-          "affectionDelta": 5,
-          "next": "s01_wellbeing_a"
+          "text": "你今天好像有什么心事。",
+          "label": "[观察]",
+          "affectionDelta": 8,
+          "skillUsed": { "id": "observe", "expGain": 2 },
+          "next": "s01_observe_path"
         },
         {
           "id": "B",
-          "text": "你为什么突然问这个。",
+          "text": "你为什么突然问这个？",
+          "label": "[直球]",
           "affectionDelta": 8,
+          "skillUsed": { "id": "direct", "expGain": 2 },
           "next": "s01_wellbeing_b"
         },
         {
           "id": "C",
-          "text": "ai_input",
-          "label": "✨ 说说你最近真正的状态",
+          "text": "还行，就是有点累。",
+          "affectionDelta": 5,
+          "skillUsed": { "id": "empathy", "expGain": 1 },
+          "next": "s01_wellbeing_a"
+        },
+        {
+          "id": "D",
+          "text": "不太好，但也说不上哪里不好。",
+          "affectionDelta": 6,
+          "skillUsed": { "id": "empathy", "expGain": 1 },
           "next": "s01_wellbeing_ai"
+        },
+        {
+          "id": "E",
+          "text": "你的手指在抖。",
+          "label": "[观察]",
+          "affectionDelta": 10,
+          "skillUsed": { "id": "observe", "expGain": 3 },
+          "requiredSkill": { "id": "observe", "level": 1 },
+          "next": "s01_observe_extra"
         }
       ]
+    },
+
+    {
+      "id": "s01_observe_path",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……"
+    },
+    {
+      "id": "s01_observe_path2",
+      "type": "narration",
+      "text": "他的视线落在你脸上，停了半秒。\n手里转杯子的动作停了一下，又继续。",
+      "next": "s01_observe_path3"
+    },
+    {
+      "id": "s01_observe_path3",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……没有。",
+      "next": "s01_observe_path4"
+    },
+    {
+      "id": "s01_observe_path4",
+      "type": "skill_toast",
+      "skill": "observe",
+      "text": "你看见了他没说出来的那一秒。",
+      "next": "s01_end_scene_transition"
+    },
+
+    {
+      "id": "s01_observe_extra",
+      "type": "narration",
+      "text": "你说出口之后，他的手才停下来。\n不是装作没听见，是真的停下来了。",
+      "next": "s01_kai_truth_a",
+      "image": {
+        "path": "assets/cg/ch1/s01_kai_hand_stop.png",
+        "status": "pending",
+        "prompt": "男主握咖啡杯的手在桌面上停住的特写，指节微微用力，杯沿与桌面之间的窄阴影，暖色调，景深虚化背景，电影感",
+        "description": "[观察] Lv1 解锁选项「你的手指在抖」触发的特写。强化玩家「真的看见了」的瞬间。"
+      }
+    },
+    {
+      "id": "s01_kai_truth_a",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……上周做了个项目，结果不太好。"
+    },
+    {
+      "id": "s01_kai_truth_a2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "distant",
+      "text": "我以为掩饰得还行。",
+      "next": "s01_kai_truth_a3"
+    },
+    {
+      "id": "s01_kai_truth_a3",
+      "type": "skill_toast",
+      "skill": "observe",
+      "text": "他第一次没把话咽回去。",
+      "next": "s01_end_scene_transition"
     },
 
     {
@@ -307,14 +394,10 @@
 
     {
       "id": "s01_wellbeing_ai",
-      "type": "ai_dialogue",
-      "character": "kai",
-      "contextNote": "玩家刚才说了最近的真实状态。凯恒会认真听完，然后用他的方式回应——不给建议，不说'你要照顾好自己'这种话，只是在那里。他可能只说一句话，或者什么都不说，只是把手边的纸巾盒推近了一点。",
-      "emotion_on_response": "attentive",
-      "fallbackKey": "generic",
-      "affectionOnPositive": 10,
-      "affectionOnNeutral": 6,
-      "affectionOnNegative": 2,
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "attentive",
+      "text": "……那就先别说哪里不好。坐一会儿。",
       "next": "s01_end_scene_transition"
     },
 

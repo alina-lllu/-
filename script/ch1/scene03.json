@@ -24,6 +24,85 @@
       "id": "s03_goodbye_setup2",
       "type": "narration",
       "text": "你说了你要去的方向。他点了点头，是另一个方向。",
+      "next": "s03_player_skill_choice"
+    },
+
+    {
+      "id": "s03_player_skill_choice",
+      "type": "choice",
+      "prompt": null,
+      "affectionNote": "这是第一章结尾的最后一次主动选择。技能能直接撬动结局——不在 affection 范围内，但靠你自己决定。",
+      "options": [
+        {
+          "id": "A",
+          "text": "下次还能在这家咖啡馆见你吗？",
+          "label": "[直球]",
+          "affectionDelta": 12,
+          "skillUsed": { "id": "direct", "expGain": 3 },
+          "setFlag": { "key": "kai_promise_made", "value": true },
+          "next": "s03_kai_promise_react"
+        },
+        {
+          "id": "B",
+          "text": "路上小心。",
+          "label": "[边界感]",
+          "affectionDelta": 6,
+          "skillUsed": { "id": "boundary", "expGain": 2 },
+          "next": "s03_boundary_react"
+        },
+        {
+          "id": "C",
+          "text": "再见。",
+          "affectionDelta": 3,
+          "next": "s03_default_react"
+        }
+      ]
+    },
+
+    {
+      "id": "s03_kai_promise_react",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "caught",
+      "text": "……"
+    },
+    {
+      "id": "s03_kai_promise_react2",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "warm",
+      "text": "……可以。",
+      "next": "s03_kai_promise_toast"
+    },
+    {
+      "id": "s03_kai_promise_toast",
+      "type": "skill_toast",
+      "skill": "direct",
+      "text": "你直接说出口的那一句，他没有躲开。",
+      "next": "s03_branch_affection"
+    },
+
+    {
+      "id": "s03_boundary_react",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……嗯。"
+    },
+    {
+      "id": "s03_boundary_react2",
+      "type": "skill_toast",
+      "skill": "boundary",
+      "text": "你没有把话说满。他记住了这一点。",
+      "next": "s03_branch_affection"
+    },
+
+    {
+      "id": "s03_default_react",
+      "type": "dialogue",
+      "speaker": "kai",
+      "emotion": "neutral",
+      "text": "……走吧。",
       "next": "s03_branch_affection"
     },
 
@@ -32,6 +111,7 @@
       "type": "affection_branch",
       "character": "kai",
       "branches": [
+        { "condition": "flag.kai_promise_made", "next": "s03_good_end" },
         { "condition": "affection >= 50", "next": "s03_good_end" },
         { "condition": "affection >= 30", "next": "s03_normal_end" },
         { "condition": "affection < 30",  "next": "s03_bad_end" }
@@ -62,7 +142,13 @@
       "id": "s03_good_end4",
       "type": "narration",
       "text": "他没有等你回答，就继续往前走了。\n但你看见他耳朵有点红。\n\n也许是冷的。\n也许不是。",
-      "next": "s03_chapter_end"
+      "next": "s03_chapter_end",
+      "image": {
+        "path": "assets/cg/ch1/s03_kai_back_red_ear.png",
+        "status": "pending",
+        "prompt": "傍晚街道，男主背影远去，路灯暖黄光晕，秋天梧桐落叶，从玩家视角俯视构图，焦点落在男主侧颈和耳朵的微红，景深虚化前景，电影感，氛围安静",
+        "description": "Good End 限定 CG。对应「也许是冷的。也许不是。」那一拍。"
+      }
     },
 
     {
@@ -101,7 +187,7 @@
       "subtitle": "深秋，偶遇",
       "stats": {
         "show": true,
-        "fields": ["affection", "ai_dialogue_count", "scenes_completed"]
+        "fields": ["affection", "scenes_completed"]
       },
       "next_chapter": "ch2_scene01",
       "unlock_memory": {

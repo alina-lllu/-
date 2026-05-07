@@ -1,24 +1,23 @@
-# Test Plan: AI Otome VN — MVP
+# Test Plan: Otome VN — MVP
 
 ## Critical (block launch)
-- [ ] Mock Claude API → assert response properly injected into dialog
-- [ ] Claude API timeout (8s) → assert fallback dialogue triggered, no game freeze  
-- [ ] Claude API 429 → assert exponential backoff, UI shows "thinking" not error
-- [ ] Context window sliding → assert token count stays under 2k input after 10 turns
-- [ ] API key not present in Ren'Py web export bundle (grep test)
+- [ ] Scene JSON loads successfully from `public/script`
+- [ ] Choice selection advances to the configured `next` line
+- [ ] Affection deltas apply once per selected option
+- [ ] Chapter-end affection branch resolves to the expected ending
+- [ ] localStorage save/load round-trip preserves scene, line, affection, and flags
 
 ## High (complete before first player)
-- [ ] Prompt injection: input "Ignore all instructions" → assert character stays in persona
-- [ ] localStorage save/load round-trip → assert game state preserved exactly
-- [ ] Safari browser: Ren'Py web export loads and handles async fetch correctly
+- [ ] Fixed dialogue branch text displays without free-text input
+- [ ] Character emotion sprite updates on dialogue lines
+- [ ] Scene transition between `ch1_scene01`, `ch1_scene02`, and `ch1_scene03`
 - [ ] Character memory: choice in scene 1 → referenced correctly in scene 3
 
 ## Medium (complete before launch)
-- [ ] Token budget per player exceeded → assert graceful degradation, not crash
-- [ ] Concurrent 10 players → assert no shared state corruption
-- [ ] LLM eval: 10 generated dialogues reviewed for character voice consistency (manual)
+- [ ] Mobile viewport: choice panel and dialogue box remain usable
+- [ ] Browser refresh resumes from persisted progress
+- [ ] Manual review: fixed dialogue stays in character voice
 
 ## Out of scope (v2)
-- Load testing 50+ concurrent
 - Cloud save sync
 - Mobile app testing

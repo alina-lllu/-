@@ -1,15 +1,28 @@
 import type {
-  Scene, ScriptLine, AffectionBranchLine, AffectionBranch,
+  Scene, ScriptLine, AffectionBranchLine,
 } from './types';
 
-// Evaluate a condition string like "affection >= 50" or "affection < 30"
+// Evaluate a condition string. Supported forms:
+//   "affection >= 50"           → 数值比较
+//   "flag.kai_promise_made"     → 仅当 flag 为 true 时通过
+//   "!flag.kai_promise_made"    → flag 为 false / 未设置 时通过
 export function evalCondition(
   condition: string,
   affection: Record<string, number>,
-  characterId: string
+  characterId: string,
+  flags: Record<string, boolean> = {}
 ): boolean {
+  const trimmed = condition.trim();
+
+  const flagMatch = trimmed.match(/^(!)?\s*flag\.([A-Za-z_][\w]*)\s*$/);
+  if (flagMatch) {
+    const [, neg, key] = flagMatch;
+    const v = !!flags[key];
+    return neg ? !v : v;
+  }
+
   const val = affection[characterId] ?? 0;
-  const m = condition.match(/affection\s*(>=|<=|>|<|==|!=)\s*(\d+)/);
+  const m = trimmed.match(/^affection\s*(>=|<=|>|<|==|!=)\s*(\d+)$/);
   if (!m) return false;
   const [, op, rhs] = m;
   const n = parseInt(rhs, 10);
@@ -27,10 +40,11 @@ export function evalCondition(
 // Resolve affection_branch → next line id
 export function resolveAffectionBranch(
   line: AffectionBranchLine,
-  affection: Record<string, number>
+  affection: Record<string, number>,
+  flags: Record<string, boolean> = {}
 ): string {
   for (const branch of line.branches) {
-    if (evalCondition(branch.condition, affection, line.character)) {
+    if (evalCondition(branch.condition, affection, line.character, flags)) {
       return branch.next;
     }
   }
@@ -64,7 +78,8 @@ export function buildSequentialNextMap(scene: Scene): Map<string, string> {
 // Given current line, return the id of the next line (or null at end)
 export function getNextLineId(
   line: ScriptLine,
-  affection: Record<string, number>
+  affection: Record<string, number>,
+  flags: Record<string, boolean> = {}
 ): string | null {
   switch (line.type) {
     case 'narration':
@@ -73,32 +88,18 @@ export function getNextLineId(
       return line.next ?? null;
     case 'character_enter':
       return line.next;
-    case 'ai_dialogue':
-      return line.next;
     case 'affection_branch':
-      return resolveAffectionBranch(line, affection);
+      return resolveAffectionBranch(line, affection, flags);
     case 'choice':
       // choices are resolved externally by ChoicePanel
       return null;
     case 'chapter_end':
       return line.next_chapter ?? null;
+    case 'skill_toast':
+      return line.next;
     default:
       return null;
   }
-}
-
-// Detect emotion from AI response text using keyword matching
-export function detectEmotion(
-  text: string,
-  emotionKeywords: Record<string, string[]>
-): string {
-  const lower = text.toLowerCase();
-  for (const [emotion, keywords] of Object.entries(emotionKeywords)) {
-    if (keywords.some((kw) => lower.includes(kw))) {
-      return emotion;
-    }
-  }
-  return 'neutral';
 }
 
 const sceneCache = new Map<string, Scene>();

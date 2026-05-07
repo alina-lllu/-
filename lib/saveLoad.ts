@@ -7,16 +7,6 @@ function slotKey(slotId: number) {
   return `${SAVE_KEY_PREFIX}${slotId}`;
 }
 
-// Compress AI history by trimming to last N messages to stay within 5MB budget
-function compressHistory(
-  history: SaveSlot['aiHistory'],
-  maxMessages = 20
-): SaveSlot['aiHistory'] {
-  const system = history.filter((m) => m.role === 'system');
-  const rest = history.filter((m) => m.role !== 'system').slice(-maxMessages);
-  return [...system, ...rest];
-}
-
 export function saveGame(
   slotId: number,
   data: Omit<SaveSlot, 'slotId' | 'timestamp'>,
@@ -26,16 +16,9 @@ export function saveGame(
     slotId,
     timestamp: new Date().toISOString(),
     ...data,
-    aiHistory: compressHistory(data.aiHistory),
     thumbnail,
   };
-  try {
-    localStorage.setItem(slotKey(slotId), JSON.stringify(slot));
-  } catch (e) {
-    // Storage quota exceeded — try trimming history further
-    slot.aiHistory = compressHistory(data.aiHistory, 6);
-    localStorage.setItem(slotKey(slotId), JSON.stringify(slot));
-  }
+  localStorage.setItem(slotKey(slotId), JSON.stringify(slot));
 }
 
 export function loadGame(slotId: number): SaveSlot | null {

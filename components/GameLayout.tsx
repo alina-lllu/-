@@ -1,18 +1,22 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Background } from './Background';
 import { CharacterSprite } from './CharacterSprite';
 import { DialogueBox } from './DialogueBox';
 import { ChoicePanel } from './ChoicePanel';
-import { AIInputPanel } from './AIInputPanel';
+import { SkillToast } from './SkillToast';
+import { EndingScreen } from './screens/EndingScreen';
 import { useGameStore } from '@/lib/gameStore';
 import {
   loadScene, buildLineIndex, buildSequentialNextMap,
-  getNextLineId, detectEmotion,
+  getNextLineId,
 } from '@/lib/gameEngine';
-import type { Scene, ScriptLine, ChoiceOption, AiDialogueLine, Emotion } from '@/lib/types';
+import { loadSkillDefinitions } from '@/lib/skillRegistry';
+import type {
+  Scene, ScriptLine, ChoiceOption, Emotion, ImagePlaceholder,
+} from '@/lib/types';
 
 // Hydration boundary: prevents Zustand persist from causing SSR/CSR mismatch.
 // The game is purely client-side, so we render nothing until mounted.
@@ -33,14 +37,14 @@ export function GameLayout() {
   const [characterEmotion, setCharacterEmotion] = useState<Emotion>('neutral');
   const [characterSrc, setCharacterSrc] = useState('');
   const [bgSrc, setBgSrc] = useState('');
+  // 当前 line 上的 image 占位。仅 status === 'ready' 时叠加渲染
+  const [readyImage, setReadyImage] = useState<ImagePlaceholder | null>(null);
   const charDataRef = useRef<Record<string, any>>({});
 
-  // Stores the last user text so 'error' state can retry without re-typing
-  const lastUserTextRef = useRef('');
-  // Pending AI text from inline ChoicePanel expand
-  const pendingAiTextRef = useRef('');
-  // Tracks whether early emotion detection fired this response
-  const emotionDetectedRef = useRef(false);
+  // ── one-time skill defs preload ───────────────────────────────────────────
+  useEffect(() => {
+    loadSkillDefinitions();
+  }, []);
 
   // ── scene loader ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -85,21 +89,6 @@ export function GameLayout() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store.sceneId]);
 
-  // ── auto-submit pending AI text when we land on an ai_dialogue line ───────
-  useEffect(() => {
-    if (
-      currentLine?.type === 'ai_dialogue' &&
-      pendingAiTextRef.current &&
-      store.aiResponseState === 'idle'
-    ) {
-      const text = pendingAiTextRef.current;
-      pendingAiTextRef.current = '';
-      handleAiSubmit(text);
-    }
-  // handleAiSubmit is stable (useCallback); currentLine changes are the trigger
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentLine]);
-
   // ── navigate to a line id ─────────────────────────────────────────────────
   const goToLine = useCallback((id: string) => {
     if (!lineIndex.has(id) && id.includes('_scene')) {
@@ -118,19 +107,23 @@ export function GameLayout() {
       }
       setCharacterVisible(true);
       store.setLineId(line.id);
-      const next = getNextLineId(line, store.affection) ?? seqNext.get(line.id);
+      const next = getNextLineId(line, store.affection, store.flags) ?? seqNext.get(line.id);
       if (next) goToLine(next);
       return;
     }
 
     if (line.type === 'affection_branch') {
-      const next = getNextLineId(line, store.affection);
+      const next = getNextLineId(line, store.affection, store.flags);
       if (next) goToLine(next);
       return;
     }
 
     store.setLineId(line.id);
     setCurrentLine(line);
+
+    // 仅 ready 状态的 image 才叠加显示，pending 时 readyImage 置空
+    const img = (line as { image?: ImagePlaceholder }).image;
+    setReadyImage(img && img.status === 'ready' ? img : null);
 
     if (line.type === 'dialogue') {
       const cd = charDataRef.current[line.speaker];
@@ -145,175 +138,30 @@ export function GameLayout() {
       setCharacterVisible(false);
     }
 
-    // Show 'thinking' emotion when entering AI dialogue (player is about to type)
-    if (line.type === 'ai_dialogue') {
-      const cd = charDataRef.current[(line as AiDialogueLine).character];
-      if (cd?.sprites?.['thinking']) {
-        setCharacterSrc(cd.sprites['thinking']);
-        setCharacterEmotion('thinking' as Emotion);
-      }
-      setCharacterVisible(true);
-    }
+    // skill_toast 不显示对话框，由 SkillToast 自己 auto-advance
+    // 这里不主动跳，等 SkillToast 触发 onDone
+
   }, [lineIndex, seqNext, store]);
 
   // ── advance on click ──────────────────────────────────────────────────────
   const handleAdvance = useCallback(() => {
     if (!currentLine) return;
-    if (
-      store.aiResponseState === 'loading' ||
-      store.aiResponseState === 'streaming'
-    ) return;
+    // skill_toast 通过 onDone 推进，点击对话框无效
+    if (currentLine.type === 'skill_toast') return;
 
     const next =
-      getNextLineId(currentLine, store.affection) ??
+      getNextLineId(currentLine, store.affection, store.flags) ??
       seqNext.get(currentLine.id);
     if (next) goToLine(next);
-  }, [currentLine, store.affection, store.aiResponseState, seqNext, goToLine]);
+  }, [currentLine, store.affection, store.flags, seqNext, goToLine]);
 
   // ── choice selection ──────────────────────────────────────────────────────
   const handleChoiceSelect = useCallback((opt: ChoiceOption) => {
     if (opt.affectionDelta) store.addAffection('kai', opt.affectionDelta);
+    if (opt.skillUsed) store.useSkill(opt.skillUsed);
+    if (opt.setFlag) store.setFlag(opt.setFlag.key, opt.setFlag.value);
     goToLine(opt.next);
   }, [store, goToLine]);
-
-  // ── inline AI select from ChoicePanel ────────────────────────────────────
-  const handleChoiceAiSelect = useCallback((text: string, opt: ChoiceOption) => {
-    pendingAiTextRef.current = text;
-    if (opt.affectionDelta) store.addAffection('kai', opt.affectionDelta);
-    goToLine(opt.next);
-  }, [store, goToLine]);
-
-  // ── AI dialogue submission ────────────────────────────────────────────────
-  const handleAiSubmit = useCallback(async (userText: string) => {
-    if (!currentLine || currentLine.type !== 'ai_dialogue') return;
-    const line = currentLine as AiDialogueLine;
-    const cd = charDataRef.current[line.character];
-    if (!cd) return;
-
-    const text = userText.trim().slice(0, 500);
-    if (!text) return;
-
-    lastUserTextRef.current = text;
-    emotionDetectedRef.current = false;
-    store.setAiResponseState('loading');
-    store.setAiResponseText('');
-
-    // Show 'thinking' emotion while loading
-    if (cd.sprites?.['thinking']) {
-      setCharacterSrc(cd.sprites['thinking']);
-      setCharacterEmotion('thinking' as Emotion);
-    }
-
-    const history = (store.aiHistory[line.character] ?? []).filter(
-      (m) => m.role !== 'system'
-    );
-    store.pushAiMessage(line.character, { role: 'user', content: text });
-
-    try {
-      const res = await fetch('/api/claude', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...history, { role: 'user', content: text }],
-          systemPrompt: cd.systemPrompt.content,
-          contextNote: line.contextNote,
-        }),
-      });
-
-      if (!res.ok) throw new Error(`API ${res.status}`);
-      if (!res.body) throw new Error('No response body');
-
-      store.setAiResponseState('streaming');
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let fullText = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const rawChunks = decoder.decode(value).split('\n\n').filter(Boolean);
-        for (const raw of rawChunks) {
-          if (!raw.startsWith('data: ')) continue;
-          let parsed: any;
-          try {
-            parsed = JSON.parse(raw.slice(6));
-          } catch {
-            continue; // skip malformed chunk
-          }
-          if (parsed.text) {
-            fullText += parsed.text;
-            store.setAiResponseText(fullText);
-
-            // Early emotion detection on first 20 chars
-            if (fullText.length >= 20 && !emotionDetectedRef.current) {
-              const earlyEmotion = detectEmotion(fullText, cd.emotionKeywords) as Emotion;
-              setCharacterEmotion(earlyEmotion);
-              setCharacterSrc(cd.sprites?.[earlyEmotion] ?? cd.sprites?.['neutral'] ?? '');
-              emotionDetectedRef.current = true;
-            }
-          }
-          if (parsed.done) store.setAiResponseState('complete');
-          if (parsed.error) throw new Error('stream error');
-        }
-      }
-
-      // Final emotion refinement on full text
-      const finalEmotion = detectEmotion(fullText, cd.emotionKeywords) as Emotion;
-      setCharacterEmotion(finalEmotion);
-      setCharacterSrc(cd.sprites?.[finalEmotion] ?? cd.sprites?.['neutral'] ?? '');
-
-      store.pushAiMessage(line.character, { role: 'assistant', content: fullText });
-      store.incrementAiDialogueCount();
-      store.setAiResponseState('complete');
-
-      const pos = ['谢谢', '喜欢', '有趣', '好', '记得', '在意'];
-      const neg = ['走', '烦', '随便', '无所谓', '不想'];
-      if (pos.some((w) => fullText.includes(w)))
-        store.addAffection(line.character, line.affectionOnPositive);
-      else if (neg.some((w) => fullText.includes(w)))
-        store.addAffection(line.character, line.affectionOnNegative);
-      else
-        store.addAffection(line.character, line.affectionOnNeutral);
-
-    } catch (err) {
-      console.error('[AI] error:', err);
-      // Set 'error' state so the UI can show retry/fallback buttons
-      store.setAiResponseState('error');
-    }
-  }, [currentLine, store]);
-
-  // ── retry after error ─────────────────────────────────────────────────────
-  const handleRetry = useCallback(() => {
-    if (lastUserTextRef.current) {
-      handleAiSubmit(lastUserTextRef.current);
-    }
-  }, [handleAiSubmit]);
-
-  // ── use fallback line after error ─────────────────────────────────────────
-  const handleFallback = useCallback(() => {
-    if (!currentLine || currentLine.type !== 'ai_dialogue') return;
-    const line = currentLine as AiDialogueLine;
-    const cd = charDataRef.current[line.character];
-    const fb = cd?.fallbackLines?.generic ?? ['……'];
-    store.setAiResponseText(fb[Math.floor(Math.random() * fb.length)]);
-    store.setAiResponseState('fallback');
-  }, [currentLine, store]);
-
-  // ── advance after AI response complete/fallback ───────────────────────────
-  const handleAiAdvance = useCallback(() => {
-    if (
-      store.aiResponseState !== 'complete' &&
-      store.aiResponseState !== 'fallback'
-    ) return;
-    store.setAiResponseState('idle');
-    store.setAiResponseText('');
-    if (!currentLine) return;
-    const next =
-      getNextLineId(currentLine, store.affection) ??
-      seqNext.get(currentLine.id);
-    if (next) goToLine(next);
-  }, [currentLine, store, seqNext, goToLine]);
 
   // ── render ────────────────────────────────────────────────────────────────
   if (!hydrated || !scene || !currentLine) {
@@ -324,42 +172,25 @@ export function GameLayout() {
     );
   }
 
-  const isAiDialogue = currentLine.type === 'ai_dialogue';
   const isChoice = currentLine.type === 'choice';
   const isNarration = currentLine.type === 'narration';
-  const aiState = store.aiResponseState;
+  const isSkillToast = currentLine.type === 'skill_toast';
+  const isChapterEnd = currentLine.type === 'chapter_end';
 
   const dialogueSpeaker = (() => {
     if (currentLine.type === 'dialogue') return currentLine.speaker;
-    if (isAiDialogue) return (currentLine as AiDialogueLine).character;
     return undefined;
   })();
 
   const dialogueText = (() => {
-    if (isAiDialogue) {
-      if (aiState === 'idle') return '……';
-      if (aiState === 'error') return '……';
-      return store.aiResponseText || '……';
-    }
     if (currentLine.type === 'dialogue') return currentLine.text;
     if (currentLine.type === 'narration') return currentLine.text;
     if (currentLine.type === 'chapter_end') return currentLine.title;
     return '';
   })();
 
-  const showAiInput =
-    isAiDialogue && (aiState === 'idle');
-
-  const showErrorPanel =
-    isAiDialogue && aiState === 'error';
-
-  const showAiResponse =
-    isAiDialogue &&
-    (aiState === 'loading' || aiState === 'streaming' ||
-     aiState === 'complete' || aiState === 'fallback');
-
-  // Character is visible unless narration; stays visible during choices
-  const spriteVisible = characterVisible && !isNarration;
+  // Character is visible unless narration / skill_toast / chapter_end; stays visible during choices
+  const spriteVisible = characterVisible && !isNarration && !isSkillToast && !isChapterEnd;
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-[#2D1B26]">
@@ -372,70 +203,64 @@ export function GameLayout() {
         position="center"
       />
 
+      {readyImage && (
+        <motion.div
+          key={readyImage.path}
+          className="absolute inset-0 z-10 pointer-events-none flex items-center justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <img
+            src={`/${readyImage.path}`}
+            alt={readyImage.description ?? ''}
+            className="max-h-[80%] max-w-[80%] object-contain rounded shadow-2xl"
+          />
+        </motion.div>
+      )}
+
       <AnimatePresence mode="wait">
-        {isChoice ? (
+        {isChapterEnd ? (
+          <EndingScreen
+            key={currentLine.id}
+            line={currentLine}
+            affection={store.affection}
+            flags={store.flags}
+            skillUsageHistory={store.skillUsageHistory}
+            scenesCompleted={store.scenesCompleted}
+            onAdvance={() => {
+              store.markSceneCompleted();
+              if (currentLine.next_chapter) {
+                store.setScene(currentLine.next_chapter, '');
+              }
+            }}
+          />
+        ) : isSkillToast ? (
+          <SkillToast
+            key={currentLine.id}
+            skill={currentLine.skill}
+            text={currentLine.text}
+            onDone={() => {
+              const next =
+                getNextLineId(currentLine, store.affection, store.flags) ??
+                seqNext.get(currentLine.id);
+              if (next) goToLine(next);
+            }}
+          />
+        ) : isChoice ? (
           <ChoicePanel
             key="choice"
             prompt={(currentLine as any).prompt ?? undefined}
             options={(currentLine as any).options}
             onSelect={handleChoiceSelect}
-            onAiSelect={handleChoiceAiSelect}
-          />
-        ) : showAiInput ? (
-          <AIInputPanel
-            key="ai-input"
-            aiState={aiState}
-            onSubmit={handleAiSubmit}
-          />
-        ) : showErrorPanel ? (
-          // Error state D: narrative wrapper with retry/fallback
-          <div
-            key="ai-error"
-            className="absolute bottom-0 left-0 right-0 z-30 p-4 pb-8"
-          >
-            <div className="max-w-2xl mx-auto bg-[#2D1B26]/90 border border-[#C9506A]/30 rounded-lg p-5 space-y-3">
-              <p className="text-[#F5ECD7]/60 text-xs font-serif italic text-center">
-                凯恒沉默了一会儿，似乎在整理思绪。
-              </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleRetry}
-                  className="flex-1 py-2 text-sm font-serif text-[#F5ECD7]
-                    border border-[#C9506A]/60 rounded
-                    hover:bg-[#C9506A]/20 transition-colors"
-                >
-                  重试
-                </button>
-                <button
-                  onClick={handleFallback}
-                  className="flex-1 py-2 text-sm font-serif text-[#F5ECD7]/70
-                    border border-[#F5ECD7]/20 rounded
-                    hover:bg-white/5 transition-colors"
-                >
-                  换个话题
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : showAiResponse ? (
-          <DialogueBox
-            key="ai-response"
-            speaker={dialogueSpeaker}
-            text={dialogueText}
-            aiState={aiState}
-            isNarration={false}
-            onAdvance={
-              aiState === 'complete' || aiState === 'fallback'
-                ? handleAiAdvance
-                : undefined
-            }
+            skillLevels={store.skills}
           />
         ) : (
           <DialogueBox
             key={currentLine.id}
             speaker={dialogueSpeaker}
             text={dialogueText}
-            aiState="idle"
             isNarration={isNarration}
             onAdvance={handleAdvance}
           />
@@ -444,7 +269,18 @@ export function GameLayout() {
 
       {process.env.NODE_ENV === 'development' && (
         <div className="absolute top-2 left-2 z-50 text-[10px] text-white/30 font-mono pointer-events-none">
-          {currentLine.id} · aff:{store.affection['kai'] ?? 0} · {aiState}
+          {currentLine.id} · aff:{store.affection['kai'] ?? 0}
+          {Object.entries(store.skills).filter(([, v]) => (v ?? 0) > 0).length > 0 && (
+            <span> · skills:{
+              Object.entries(store.skills)
+                .filter(([, v]) => (v ?? 0) > 0)
+                .map(([k, v]) => `${k}${v}`)
+                .join(',')
+            }</span>
+          )}
+          {Object.keys(store.flags).length > 0 && (
+            <span> · flags:{Object.keys(store.flags).filter((k) => store.flags[k]).join(',')}</span>
+          )}
         </div>
       )}
     </div>

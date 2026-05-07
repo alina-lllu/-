@@ -1,15 +1,15 @@
-# 凯恒 · AI 乙女游戏
+# 凯恒 · 乙女视觉小说
 
-一款以 **AI 对话为核心体验**的中文乙女视觉小说。玩家与建筑设计师凯恒展开真实的对话——每一句回应都由 Claude AI 实时生成，不是预设台词。
+一款中文乙女视觉小说。玩家与建筑设计师凯恒在固定剧情和分支选项中推进关系，每一句回应都来自预设脚本。
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue) ![Framer Motion](https://img.shields.io/badge/Framer_Motion-11-purple) ![Claude](https://img.shields.io/badge/Claude-Haiku-orange)
+![Next.js](https://img.shields.io/badge/Next.js-14-black) ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue) ![Framer Motion](https://img.shields.io/badge/Framer_Motion-11-purple)
 
 ---
 
 ## 核心特色
 
-- **真实 AI 对话** — 凯恒的每一句回应由 Claude Haiku 实时生成，理解你说的每一句话
-- **情绪联动立绘** — 凯恒根据对话内容实时切换 7 种情绪表情（思考 / 专注 / 微笑 / 温柔…）
+- **固定剧情分支** — 玩家通过预设选项推进对话，保证角色语气和剧情节奏稳定
+- **情绪联动立绘** — 凯恒根据剧情节点切换 7 种情绪表情（思考 / 专注 / 微笑 / 温柔…）
 - **好感度系统** — 你的每一次选择都影响关系走向，触发不同剧情分支
 - **沉浸式美术** — 3 个手绘风 SVG 场景（咖啡馆午后 / 雨天 / 傍晚），含粒子动画和雨滴效果
 - **中文优先** — 专为华语玩家设计的剧情与角色
@@ -19,22 +19,22 @@
 ## 技术架构
 
 ```
-浏览器                          服务端（Vercel）
-────────                        ────────────────
-Next.js 14 App Router           API Route /api/claude
-Framer Motion 动画              ↕ SSE 流式输出
-Zustand 游戏状态                 Anthropic SDK
-localStorage 存档                Claude Haiku
-SVG 纯代码美术                   API Key 安全隔离
+浏览器
+────────
+Next.js 14 App Router
+Framer Motion 动画
+Zustand 游戏状态
+localStorage 存档
+SVG 纯代码美术
 ```
 
-**为什么不用 Ren'Py？** Ren'Py 的 WASM 导出无法建立 TCP 连接，Claude API 调不通；自定义动画在 canvas 渲染模型里极度受限。React + Next.js 是唯一能同时满足 AI 对话 + 自定义动画 + Key 安全隔离的方案。
+**为什么不用 Ren'Py？** 当前版本需要自定义 UI、动画和网页部署体验，React + Next.js 更适合快速迭代。
 
 ---
 
 ## 本地运行
 
-**环境要求：** Node.js 18+，Anthropic API Key
+**环境要求：** Node.js 18+
 
 ```bash
 # 1. 克隆
@@ -44,16 +44,10 @@ cd otome-ai-vn-
 # 2. 安装依赖
 npm install
 
-# 3. 配置 API Key
-cp .env.local.example .env.local
-# 编辑 .env.local，填入你的 ANTHROPIC_API_KEY
-
-# 4. 启动
+# 3. 启动
 npm run dev
 # 访问 http://localhost:3000
 ```
-
-> **没有 API Key？** 也可以运行——AI 对话节点会自动使用凯恒的备用台词，剧情主线完全可玩。
 
 ---
 
@@ -61,28 +55,27 @@ npm run dev
 
 ```
 app/
-  api/claude/route.ts   # Claude SSE 代理（API Key 永不进浏览器）
   layout.tsx            # 根布局
   page.tsx              # 入口
 
 components/
-  GameLayout.tsx        # 主控制器（状态机、场景加载、AI 流程）
+  GameLayout.tsx        # 主控制器（状态机、场景加载、剧情推进）
   KaiCharacter.tsx      # 凯恒 SVG 立绘（7 种情绪，Framer Motion 动画）
   SceneBackground.tsx   # 3 个 SVG 场景背景（含粒子/雨滴动画）
-  DialogueBox.tsx       # 对话框（支持流式 AI 输出）
-  ChoicePanel.tsx       # 选项面板（含内嵌 AI 自由输入）
+  DialogueBox.tsx       # 对话框
+  ChoicePanel.tsx       # 选项面板
   Background.tsx        # 场景淡入淡出切换
   CharacterSprite.tsx   # 立绘入场动画
 
 lib/
   types.ts              # 全局 TypeScript 类型
-  gameStore.ts          # Zustand 游戏状态（好感度、AI 历史、存档）
-  gameEngine.ts         # 脚本引擎（场景加载、分支解析、情绪检测）
-  saveLoad.ts           # 本地存档（localStorage，含压缩策略）
+  gameStore.ts          # Zustand 游戏状态（好感度、剧情进度、存档）
+  gameEngine.ts         # 脚本引擎（场景加载、分支解析）
+  saveLoad.ts           # 本地存档（localStorage）
 
 public/script/          # 剧情脚本 JSON（浏览器直接 fetch）
-  ch1/                  # 第一章（3 个场景，7 个 AI 对话节点）
-  characters/kai.json   # 凯恒角色数据（系统提示词、情绪关键词）
+  ch1/                  # 第一章（3 个场景，固定剧情分支）
+  characters/kai.json   # 凯恒角色数据（立绘资源）
 ```
 
 ---
@@ -109,7 +102,7 @@ public/script/          # 剧情脚本 JSON（浏览器直接 fetch）
 
 ## 开发路线图
 
-- [x] P0 — 核心引擎（场景 / 分支 / AI 对话 / 存档）
+- [x] P0 — 核心引擎（场景 / 分支 / 存档）
 - [x] P0 — SVG 美术（凯恒立绘 × 7 情绪，场景背景 × 3）
 - [x] P0 — 第一章剧情脚本
 - [ ] P1 — 标题屏 / 顶栏 / 存档界面
