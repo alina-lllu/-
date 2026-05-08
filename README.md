@@ -37,9 +37,9 @@ SVG 纯代码美术
 **环境要求：** Node.js 18+
 
 ```bash
-# 1. 克隆
-git clone git@github.com:wei-xie24/otome-ai-vn-.git
-cd otome-ai-vn-
+# 1. 克隆（仓库名为单字符 `-`，clone 时指定目录名避免与 shell `cd -` 冲突）
+git clone https://github.com/alina-lllu/-.git otome-vn
+cd otome-vn
 
 # 2. 安装依赖
 npm install
@@ -116,4 +116,4 @@ public/script/          # 剧情脚本 JSON（浏览器直接 fetch）
 
 ## License
 
-MIT © 2026 wei-xie24
+MIT © 2026 alina-lllu
